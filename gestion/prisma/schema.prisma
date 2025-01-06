@@ -1,0 +1,46 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["fullTextSearch", "fullTextIndex"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+ model Users{
+  id_user          Int         @id @default(autoincrement())
+  name             String
+  firstname        String
+  mail             String
+  password         String
+  role             String   
+  announcements    Announcements[] 
+ }
+
+  model Announcements{
+  id_announcement   Int        @id @default(autoincrement())
+  title             String
+  description       String     @db.Text
+  userId            Int       
+  user              Users       @relation(fields: [userId], references: [id_user ])
+  messages          Messages[] 
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+ }
+
+  model Messages{
+  id_message       Int        @id @default(autoincrement())
+  content          String
+  timestamp        DateTime
+  id_user_sender   Int
+  id_user_receiver Int
+  announcementId   Int       
+  announcements     Announcements   @relation(fields: [announcementId], references: [id_announcement])
+ }
