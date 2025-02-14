@@ -19,20 +19,29 @@ const validateSkill = (req, res, next) => {
 
 // Ajouter une compétence
 router.post("/", validateSkill, async (req, res) => {
-  const { name, description, userId } = req.body;
+  const { name, description } = req.body;
 
   try {
     const newSkill = await prisma.skills.create({
       data: {
         name,
         description,
-        user: { connect: { id_user: userId } },
       },
     });
     res.status(201).json(newSkill);
   } catch (error) {
     console.error("Erreur lors de l'ajout de la compétence :", error);
     res.status(500).json({ error: "Erreur lors de l'ajout de la compétence." });
+  }
+});
+
+// Récupérer toutes les compétences 
+router.get("/", async (req, res) => {
+  try {
+    const skills = await prisma.skills.findMany();
+    res.status(200).json(skills);
+  } catch (error) {
+    res.status(500).json({ error: "Erreur lors de la récupération des compétences." });
   }
 });
 
