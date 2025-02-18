@@ -14,33 +14,59 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
- model Users{
-  id_user          Int         @id @default(autoincrement())
-  name             String
-  firstname        String
-  mail             String
-  password         String
-  role             String   
-  announcements    Announcements[] 
- }
+model Users {
+  id_user       Int         @id @default(autoincrement())
+  name          String
+  firstname     String
+  mail          String      @unique
+  password      String
+  role          String
+  address       String?   
+  latitude      Float?
+  longitude     Float?
+  city          String?
+  country       String?
+  skills        UserSkills[]
+  announcements Announcements[]
+  messagesSent  Messages[] @relation("SentMessages")
+  messagesReceived Messages[] @relation("ReceivedMessages")
+}
 
-  model Announcements{
-  id_announcement   Int        @id @default(autoincrement())
-  title             String
-  description       String     @db.Text
-  userId            Int       
-  user              Users       @relation(fields: [userId], references: [id_user ])
-  messages          Messages[] 
-  createdAt         DateTime   @default(now())
-  updatedAt         DateTime   @updatedAt
- }
+model Skills {
+  id_skill    Int          @id @default(autoincrement())
+  name        String       @unique
+  description String
+  users       UserSkills[]
+}
 
-  model Messages{
+model UserSkills {
+  userId  Int
+  skillId Int
+  user    Users @relation(fields: [userId], references: [id_user])
+  skill   Skills @relation(fields: [skillId], references: [id_skill])
+  
+  @@id([userId, skillId])
+}
+
+model Announcements {
+  id_announcement Int        @id @default(autoincrement())
+  title           String
+  description     String     @db.Text
+  userId          Int       
+  user            Users      @relation(fields: [userId], references: [id_user])
+  messages        Messages[]
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+}
+
+model Messages {
   id_message       Int        @id @default(autoincrement())
   content          String
   timestamp        DateTime
-  id_user_sender   Int
-  id_user_receiver Int
+  userIdSender     Int
+  userIdReceiver   Int
   announcementId   Int       
-  announcements     Announcements   @relation(fields: [announcementId], references: [id_announcement])
- }
+  announcement     Announcements @relation(fields: [announcementId], references: [id_announcement])
+  sender           Users @relation("SentMessages", fields: [userIdSender], references: [id_user])
+  receiver         Users @relation("ReceivedMessages", fields: [userIdReceiver], references: [id_user])
+}
