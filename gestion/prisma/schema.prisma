@@ -4,6 +4,12 @@
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
 generator client {
   provider = "prisma-client-js"
   previewFeatures = ["fullTextSearch", "fullTextIndex"]
@@ -15,58 +21,63 @@ datasource db {
 }
 
 model Users {
-  id_user       Int         @id @default(autoincrement())
-  name          String
-  firstname     String
-  mail          String      @unique
-  password      String
-  role          String
-  address       String?   
-  latitude      Float?
-  longitude     Float?
-  city          String?
-  country       String?
-  skills        UserSkills[]
-  announcements Announcements[]
-  messagesSent  Messages[] @relation("SentMessages")
-  messagesReceived Messages[] @relation("ReceivedMessages")
-}
-
-model Skills {
-  id_skill    Int          @id @default(autoincrement())
-  name        String       @unique
-  description String
-  users       UserSkills[]
-}
-
-model UserSkills {
-  userId  Int
-  skillId Int
-  user    Users @relation(fields: [userId], references: [id_user])
-  skill   Skills @relation(fields: [skillId], references: [id_skill])
-  
-  @@id([userId, skillId])
+  id_user           Int             @id @default(autoincrement())
+  name              String
+  firstname         String
+  mail              String          @unique
+  password          String
+  role              String
+  address           String?   
+  latitude          Float
+  longitude         Float
+  postal_code       String
+  phone             String
+  bio               String
+  announcements     Announcements[]
+  messagesSent      Messages[]      @relation("SentMessages")
+  messagesReceived  Messages[]      @relation("ReceivedMessages")
+  conversations1    Conversations[] @relation("User1Conversations")
+  conversations2    Conversations[] @relation("User2Conversations")
 }
 
 model Announcements {
-  id_announcement Int        @id @default(autoincrement())
-  title           String
-  description     String     @db.Text
-  userId          Int       
-  user            Users      @relation(fields: [userId], references: [id_user])
-  messages        Messages[]
-  createdAt       DateTime   @default(now())
-  updatedAt       DateTime   @updatedAt
+  id_announcement   Int            @id @default(autoincrement())
+  title             String
+  description       String         @db.Text
+  userId            Int       
+  user              Users          @relation(fields: [userId], references: [id_user])
+  messages          Messages[]
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  image             String?
+  conversation     Conversations[]
+}
+
+model Conversations {
+  id_conversation   Int            @id @default(autoincrement())
+  userSender        Int
+  userReceiver      Int
+  user1             Users          @relation("User1Conversations", fields: [userSender], references: [id_user])
+  user2             Users          @relation("User2Conversations", fields: [userReceiver], references: [id_user])
+  messages          Messages[]
+  lastMessageId     Int?           @unique // Ajout de @unique pour une relation un-à-un
+  lastMessage       Messages?      @relation("LastMessage", fields: [lastMessageId], references: [id_message])
+  updatedAt         DateTime       @updatedAt
+  announcementId    Int
+  announcement      Announcements  @relation(fields: [announcementId], references: [id_announcement])
 }
 
 model Messages {
-  id_message       Int        @id @default(autoincrement())
-  content          String
-  timestamp        DateTime
-  userIdSender     Int
-  userIdReceiver   Int
-  announcementId   Int       
-  announcement     Announcements @relation(fields: [announcementId], references: [id_announcement])
-  sender           Users @relation("SentMessages", fields: [userIdSender], references: [id_user])
-  receiver         Users @relation("ReceivedMessages", fields: [userIdReceiver], references: [id_user])
+  id_message        Int            @id @default(autoincrement())
+  content           String
+  timestamp         DateTime       @default(now())
+  userIdSender      Int
+  userIdReceiver    Int
+  conversationId    Int
+  announcementId    Int       
+  announcement      Announcements  @relation(fields: [announcementId], references: [id_announcement])
+  sender            Users          @relation("SentMessages", fields: [userIdSender], references: [id_user])
+  receiver          Users          @relation("ReceivedMessages", fields: [userIdReceiver], references: [id_user])
+  conversation      Conversations  @relation(fields: [conversationId], references: [id_conversation])
+  lastMessageForConversation Conversations? @relation("LastMessage") 
 }

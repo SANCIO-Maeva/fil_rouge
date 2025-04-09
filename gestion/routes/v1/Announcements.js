@@ -19,13 +19,13 @@ const validateAnnouncement = (req, res, next) => {
   
 /// Créer une annonce
 router.post("/", validateAnnouncement, async (req, res) => {
-  const { title, description, userId } = req.body;
-
+  const { title, description, userId, image } = req.body;
   try {
     const newAnnouncement = await prisma.announcements.create({
       data: {
         title,
         description,
+        image,
         user: {
           connect: {
             id_user: userId,
@@ -43,11 +43,15 @@ router.post("/", validateAnnouncement, async (req, res) => {
 // Obtenir toutes les annonces
 router.get("/", async (req, res) => {
   try {
-    const announcements = await prisma.announcements.findMany({
-      include: { services: true },
-    });
-    res.status(200).json(announcements);
-  } catch (error) {
+    const announcements = await prisma.announcements.findMany();
+    res.status(200).json(announcements.map((announcement) => {
+      return {
+        id: announcement.id_announcement,
+        ...announcement,
+      };
+    }
+    ));
+    } catch (error) {
     console.error("Erreur lors de la récupération des annonces :", error);
     res.status(500).json({ error: "Erreur lors de la récupération des annonces." });
   }
@@ -59,14 +63,42 @@ router.get("/", async (req, res) => {
     try {
       const announcement = await prisma.announcements.findUnique({
         where: { id_announcement: parseInt(id) },
-        include: { services: true },
       });
       if (!announcement) return res.status(404).json({ error: "Annonce introuvable." });
-      res.status(200).json(announcement);
-    } catch (error) {
+      res.status(200).json(announcements.map((announcement) => {
+        return {
+          id: announcement.id_announcement,
+          ...announcement,
+        };
+      }
+      ));    } catch (error) {
       res.status(500).json({ error: "Erreur lors de la récupération de l'annonce." });
     }
   });
+
+  // Obtenir une annonce par ID de l'utilisateur
+  router.get("/user/:userId", async (req, res) => {
+    const { userId } = req.params;
+    try {
+      const announcements = await prisma.announcements.findMany({
+        where: { userId: parseInt(userId) },
+      });
+      if (!announcements || announcements.length === 0) {
+        return res.status(404).json({ error: "Aucune annonce trouvée pour cet utilisateur." });
+      }
+      res.status(200).json(announcements.map((announcement) => {
+        return {
+          id: announcement.id_announcement,
+          ...announcement,
+        };
+      }
+      ));
+    } catch (error) {
+      console.error("Erreur serveur:", error);
+      res.status(500).json({ error: "Erreur lors de la récupération des annonces." });
+    }
+  });
+  
   
   // Mettre à jour une annonce
   router.put("/:id", validateAnnouncement, async (req, res) => {

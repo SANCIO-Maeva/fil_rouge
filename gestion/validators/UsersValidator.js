@@ -36,27 +36,22 @@ const UsersValidator = z.object({
   
   latitude: z
     .number()
-    .min(-90, "La latitude doit être entre -90 et 90")
-    .max(90, "La latitude doit être entre -90 et 90")
-    .optional(), // Optionnel, car certains utilisateurs peuvent ne pas avoir de localisation
+    .optional(),
   
   longitude: z
     .number()
-    .min(-180, "La longitude doit être entre -180 et 180")
-    .max(180, "La longitude doit être entre -180 et 180")
-    .optional(), // Optionnel aussi
+    .optional(),
   
-  city: z
+  postal_code: z
     .string()
-    .min(1, "La ville est requise")
-    .max(100, "Le nom de la ville est trop long")
-    .optional(), // Optionnel si tu ne veux pas obliger ce champ
-  
-  country: z
+    .min(1, "Le code postal est requis"),
+  bio: z
     .string()
-    .min(1, "Le pays est requis")
-    .max(100, "Le nom du pays est trop long")
-    .optional(), // Optionnel également
+    .min(1, "Une biographie est requise")
+    .max(500, "La biographie est trop longue"),
+
+  phone : z
+    .string(),
 });
 
 export default UsersValidator;
