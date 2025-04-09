@@ -39,6 +39,11 @@ model Users {
   conversations1    Conversations[] @relation("User1Conversations")
   conversations2    Conversations[] @relation("User2Conversations")
 }
+model Categories {
+  id_category       Int            @id @default(autoincrement())
+  name              String
+  announcements     Announcements[]
+}
 
 model Announcements {
   id_announcement   Int            @id @default(autoincrement())
@@ -51,6 +56,8 @@ model Announcements {
   updatedAt         DateTime       @updatedAt
   image             String?
   conversation     Conversations[]
+  categoryId        Int
+  category          Categories      @relation(fields: [categoryId], references: [id_category])
 }
 
 model Conversations {
