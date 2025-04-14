@@ -49,13 +49,7 @@ const validateAnnouncement = (req, res, next) => {
 router.get("/", async (req, res) => {
   const { userId } = req.query; 
   try {
-    const announcements = await prisma.announcements.findMany({
-      where: {
-        userId: {
-          not: parseInt(userId),
-        },
-      },
-    });
+    const announcements = await prisma.announcements.findMany({});
     res.status(200).json(
       announcements.map((announcement) => {
         return {

@@ -56,6 +56,7 @@ router.post('/', validateMessage, async (req, res) => {
     const newMessage = await prisma.messages.create({
       data: {
         content,
+        isRead: false,
         conversation: {
           connect: { id_conversation: conversation.id_conversation },
         },
@@ -104,21 +105,42 @@ router.get('/user/:userId', async (req, res) => {
   }
 });
 
-// Obtenir tous les messages d'une discussion
-router.get('/discussion/:userId1/:userId2', async (req, res) => {
+// Obtenir tous les messages d'une conversation
+router.get('/conversation/:userId1/:userId2', async (req, res) => {
+  const userId1 = Number(req.params.userId1);
+  const userId2 = Number(req.params.userId2);
+
   try {
-    const messages = await prisma.messages.findMany({
+    // Trouver la conversation existante
+    const conversation = await prisma.conversations.findFirst({
       where: {
         OR: [
-          {
-            userIdSender: Number(req.params.userId1),
-            userIdReceiver: Number(req.params.userId2),
-          },
-          {
-            userIdSender: Number(req.params.userId2),
-            userIdReceiver: Number(req.params.userId1),
-          },
+          { userSender: userId1, userReceiver: userId2 },
+          { userSender: userId2, userReceiver: userId1 },
         ],
+      },
+    });
+
+    if (!conversation) {
+      return res.status(404).json({ error: 'Conversation non trouvée.' });
+    }
+
+    // 👉 Marquer les messages comme lus pour l'utilisateur connecté (userId1)
+    await prisma.messages.updateMany({
+      where: {
+        conversationId: conversation.id_conversation,
+        userIdReceiver: userId1, // l’utilisateur qui ouvre la conversation
+        isRead: false,
+      },
+      data: {
+        isRead: true,
+      },
+    });
+
+    // Récupérer les messages de la conversation
+    const messages = await prisma.messages.findMany({
+      where: {
+        conversationId: conversation.id_conversation,
       },
       orderBy: { timestamp: 'asc' },
       include: {
@@ -130,10 +152,9 @@ router.get('/discussion/:userId1/:userId2', async (req, res) => {
     res.status(200).json(messages);
   } catch (error) {
     console.error('Erreur lors de la récupération de la discussion :', error);
-    res
-      .status(500)
-      .json({ error: 'Erreur lors de la récupération de la discussion.' });
+    res.status(500).json({ error: 'Erreur lors de la récupération de la discussion.' });
   }
 });
+
 
 export default router;

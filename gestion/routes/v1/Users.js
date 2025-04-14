@@ -106,11 +106,11 @@ router.get("/", async (req, res) => {
   // Mettre à jour un utilisateur
   router.put("/:id", validatedUser, async (req, res) => {
     const { id } = req.params;
-    const { mail, phone, bio, password } = req.body;
+    const {phone} = req.body;
     try {
       const updatedUser = await prisma.users.update({
         where: { id_user: parseInt(id) },
-        data: { mail, phone, bio, password },
+        data: {phone},
       });
       res.status(200).json(updatedUser);
     } catch (error) {

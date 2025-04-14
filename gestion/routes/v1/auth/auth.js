@@ -1,12 +1,11 @@
 // src/routes/v1/auth/auth.js
 import express from 'express';
-import { PrismaClient } from '@prisma/client';  // Prisma pour interagir avec la base de données
-import bcrypt from 'bcrypt';  // Importation de bcrypt pour le hachage des mots de passe
+import { PrismaClient } from '@prisma/client';  
+import bcrypt from 'bcrypt';  
 
 const router = express.Router();
 const prisma = new PrismaClient();
 
-// Route pour la connexion de l'utilisateur (authentification simple)
 router.post('/login', async (req, res) => {
   const { mail, password } = req.body;  // Récupération des informations envoyées dans le corps de la requête
 
@@ -79,7 +78,7 @@ router.post('/forgot', async (req, res) => {
     return res.status(200).json({
       message: 'Connexion réussie',
       user: {
-        id: user.id,
+        id: user.id_user,
         name: user.name,
         firstname: user.firstname,
         mail: user.mail,

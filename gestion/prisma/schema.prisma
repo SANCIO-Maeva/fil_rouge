@@ -54,7 +54,7 @@ model Announcements {
   messages          Messages[]
   createdAt         DateTime       @default(now())
   updatedAt         DateTime       @updatedAt
-  image             String?
+  image             String?        @db.LongText  
   conversation     Conversations[]
   categoryId        Int
   category          Categories      @relation(fields: [categoryId], references: [id_category])
@@ -73,7 +73,6 @@ model Conversations {
   announcementId    Int
   announcement      Announcements  @relation(fields: [announcementId], references: [id_announcement])
 }
-
 model Messages {
   id_message        Int            @id @default(autoincrement())
   content           String
@@ -81,7 +80,8 @@ model Messages {
   userIdSender      Int
   userIdReceiver    Int
   conversationId    Int
-  announcementId    Int       
+  announcementId    Int
+  isRead            Boolean        @default(false)       
   announcement      Announcements  @relation(fields: [announcementId], references: [id_announcement])
   sender            Users          @relation("SentMessages", fields: [userIdSender], references: [id_user])
   receiver          Users          @relation("ReceivedMessages", fields: [userIdReceiver], references: [id_user])
