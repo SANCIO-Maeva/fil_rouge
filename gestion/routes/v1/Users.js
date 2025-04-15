@@ -103,20 +103,29 @@ router.get("/", async (req, res) => {
     }
   });
 
-  // Mettre à jour un utilisateur
-  router.put("/:id", validatedUser, async (req, res) => {
-    const { id } = req.params;
-    const {phone} = req.body;
-    try {
-      const updatedUser = await prisma.users.update({
-        where: { id_user: parseInt(id) },
-        data: {phone},
-      });
-      res.status(200).json(updatedUser);
-    } catch (error) {
-      res.status(500).json({ error: "Erreur lors de la mise à jour de l'utilisateur." });
+// Mettre à jour un utilisateur
+router.put("/:id", async (req, res) => {
+  const { id } = req.params;
+  const { password, ...otherData } = req.body;
+
+  try {
+    let updatedData = { ...otherData };
+    if (password) {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      updatedData.password = hashedPassword;
     }
-  });
+
+    const updatedUser = await prisma.users.update({
+      where: { id_user: parseInt(id) },
+      data: updatedData,
+    });
+
+    res.status(200).json(updatedUser);
+  } catch (error) {
+    console.error("Erreur lors de la mise à jour de l'utilisateur :", error);
+    res.status(500).json({ error: "Erreur lors de la mise à jour de l'utilisateur." });
+  }
+});
   
   // Supprimer un utilisateur
   router.delete("/:id", async (req, res) => {

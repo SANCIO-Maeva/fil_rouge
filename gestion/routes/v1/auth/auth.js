@@ -82,6 +82,7 @@ router.post('/forgot', async (req, res) => {
         name: user.name,
         firstname: user.firstname,
         mail: user.mail,
+        password: user.password,
         role: user.role,
         address: user.address,
         latitude: user.latitude,
