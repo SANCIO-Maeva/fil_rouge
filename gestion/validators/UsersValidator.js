@@ -1,15 +1,10 @@
 import { z } from "zod";
 
 const UsersValidator = z.object({
-  name: z
+  fullname: z
     .string()
     .min(1, "Le nom est requis")
     .max(100, "Le nom est trop long"),
-  
-  firstname: z
-    .string()
-    .min(1, "Le prénom est requis")
-    .max(100, "Le prénom est trop long"),
   
   mail: z
     .string()

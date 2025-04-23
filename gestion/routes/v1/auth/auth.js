@@ -34,8 +34,7 @@ router.post('/login', async (req, res) => {
       message: 'Connexion réussie',
       user: {
         id: user.id_user,
-        name: user.name,
-        firstname: user.firstname,
+        fullname: user.fullname,
         mail: user.mail,
         role: user.role,
         address: user.address,
@@ -79,8 +78,7 @@ router.post('/forgot', async (req, res) => {
       message: 'Connexion réussie',
       user: {
         id: user.id_user,
-        name: user.name,
-        firstname: user.firstname,
+        fullname: user.fullname,
         mail: user.mail,
         password: user.password,
         role: user.role,

@@ -57,8 +57,7 @@ router.post("/", async (req, res) => {
     // Créer l'utilisateur dans la base de données
     const newUser = await prisma.users.create({
       data: {
-        name: validatedUser.name,
-        firstname: validatedUser.firstname,
+        fullname: validatedUser.fullname,
         mail: validatedUser.mail,
         password: hashedPassword,
         role: validatedUser.role,
