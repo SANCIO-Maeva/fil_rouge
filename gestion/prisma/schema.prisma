@@ -66,7 +66,7 @@ model Conversations {
   user1             Users          @relation("User1Conversations", fields: [userSender], references: [id_user])
   user2             Users          @relation("User2Conversations", fields: [userReceiver], references: [id_user])
   messages          Messages[]
-  lastMessageId     Int?           @unique // Ajout de @unique pour une relation un-à-un
+  lastMessageId     Int?           @unique 
   lastMessage       Messages?      @relation("LastMessage", fields: [lastMessageId], references: [id_message])
   updatedAt         DateTime       @updatedAt
   announcementId    Int
@@ -80,7 +80,6 @@ model Messages {
   userIdReceiver    Int
   conversationId    Int
   announcementId    Int
-  isRead            Boolean        @default(false)       
   announcement      Announcements  @relation(fields: [announcementId], references: [id_announcement])
   sender            Users          @relation("SentMessages", fields: [userIdSender], references: [id_user])
   receiver          Users          @relation("ReceivedMessages", fields: [userIdReceiver], references: [id_user])

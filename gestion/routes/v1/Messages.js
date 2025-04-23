@@ -56,7 +56,6 @@ router.post('/', validateMessage, async (req, res) => {
     const newMessage = await prisma.messages.create({
       data: {
         content,
-        isRead: false,
         conversation: {
           connect: { id_conversation: conversation.id_conversation },
         },
@@ -124,19 +123,6 @@ router.get('/conversation/:userId1/:userId2', async (req, res) => {
     if (!conversation) {
       return res.status(404).json({ error: 'Conversation non trouvée.' });
     }
-
-    // 👉 Marquer les messages comme lus pour l'utilisateur connecté (userId1)
-    await prisma.messages.updateMany({
-      where: {
-        conversationId: conversation.id_conversation,
-        userIdReceiver: userId1, // l’utilisateur qui ouvre la conversation
-        isRead: false,
-      },
-      data: {
-        isRead: true,
-      },
-    });
-
     // Récupérer les messages de la conversation
     const messages = await prisma.messages.findMany({
       where: {
@@ -144,8 +130,8 @@ router.get('/conversation/:userId1/:userId2', async (req, res) => {
       },
       orderBy: { timestamp: 'asc' },
       include: {
-        sender: { select: { id_user: true, firstname: true, name: true } },
-        receiver: { select: { id_user: true, firstname: true, name: true } },
+        sender: { select: { id_user: true, fullname: true} },
+        receiver: { select: { id_user: true, fullname: true } },
       },
     });
 

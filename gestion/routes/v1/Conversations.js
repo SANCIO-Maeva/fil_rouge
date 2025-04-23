@@ -23,14 +23,12 @@ router.get("/", async (req, res) => {
         include: {
           user1: {
             select: {
-              firstname: true,
-              name: true,
+              fullname: true,
             },
           },
           user2: {
             select: {
-              firstname: true,
-              name: true,
+              fullname: true,
             },
           },
         },
@@ -50,8 +48,8 @@ router.get("/:id", async (req, res) => {
         const conversation = await prisma.conversations.findUnique({
             where: { id_conversation: parseInt(id) },
             include: {
-                user1: { select: { firstname: true, name: true } },
-                user2: { select: { firstname: true, name: true } },
+                user1: { select: { fullname: true } },
+                user2: { select: { fullname: true } },
             },
         });
 
@@ -89,15 +87,13 @@ router.get("/user/:userId", async (req, res) => {
           user1: {
             select: {
               id_user: true,
-              firstname: true,
-              name: true,
+              fullname: true,
             },
           },
           user2: {
             select: {
               id_user: true,
-              firstname: true,
-              name: true,
+              fullname: true,
             },
           },
           lastMessage: {
