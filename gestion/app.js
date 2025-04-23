@@ -1,18 +1,16 @@
 import express from "express";
 import cors from "cors";
 import V1Router from "./routes/v1.js";
-import postgres from "postgres";  
 
 export const app = express();
-export default sql;
-const connectionString = process.env.DATABASE_URL;
-const sql = postgres(connectionString)
+
+const BASE_URL = process.env.BASE_URL;
 
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ limit: "10mb", extended: true }));
 app.use(
   cors({
-    origin: [DATABASE_URL],
+    origin: [BASE_URL],
     credentials: true,
   })
 );
