@@ -16,7 +16,7 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -53,7 +53,7 @@ model Announcements {
   messages          Messages[]
   createdAt         DateTime       @default(now())
   updatedAt         DateTime       @updatedAt
-  image             String?        @db.LongText  
+  image             String?        @db.Text
   conversation     Conversations[]
   categoryId        Int
   category          Categories      @relation(fields: [categoryId], references: [id_category])
